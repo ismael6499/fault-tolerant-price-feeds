@@ -2,11 +2,13 @@
 src = "src"
 out = "out"
 libs = ["lib"]
-solc_version = "0.8.25"
+solc_version = "0.8.24"
 
 remappings = [
-    "@chainlink/contracts/=lib/chainlink/contracts/",
-    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/"
+    "@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/",
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+    "@pyth-sdk-solidity/=lib/pyth-sdk-solidity/"
 ]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+ignored_error_codes = [6546]

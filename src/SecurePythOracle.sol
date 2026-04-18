@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity 0.8.24;
 
 import {IPyth} from "@pyth-sdk-solidity/IPyth.sol";
 import {PythStructs} from "@pyth-sdk-solidity/PythStructs.sol";
@@ -88,16 +88,9 @@ contract SecurePythOracle {
         if (_expo < MIN_ACCEPTABLE_EXPO) revert InvalidExponent();
 
         // Check if confidence interval is too wide (must be > MIN_CONFIDENCE_RATIO basis points)
-        if (_confidence == 0 || (uint256(uint64(_abs(_price))) * 1e4 / uint256(_confidence)) <= MIN_CONFIDENCE_RATIO) {
+        if (_confidence == 0 || (uint256(uint64(_price)) * 1e4 / uint256(_confidence)) <= MIN_CONFIDENCE_RATIO) {
             revert UntrustedPrice();
         }
-    }
-
-    /**
-     * @dev Helper to compute the absolute value of an int64.
-     */
-    function _abs(int64 _x) internal pure returns (int64) {
-        return _x >= 0 ? _x : -_x;
     }
 
     /**

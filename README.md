@@ -1,6 +1,6 @@
 # 🧿 Oracle Integration Workshop
 
-![Solidity](https://img.shields.io/badge/Solidity-0.8.25-363636?style=flat-square&logo=solidity)
+![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?style=flat-square&logo=solidity)
 ![DeFi](https://img.shields.io/badge/DeFi-Oracles-blueviolet?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Verified-brightgreen?style=flat-square)
 
@@ -45,7 +45,7 @@ This repository demonstrates how to build robust wrappers and fallback mechanism
 
 ## 🛠 Tech Stack
 
-* **Core:** Solidity `0.8.25`
+* **Core:** Solidity `0.8.24`
 * **Foundry:** `forge`, `cast` (Industry standard for testing and scripts).
 * **Integrations:** Chainlink AggregatorV3, Pyth SDK Solidity.
 * **Libraries:** OpenZeppelin Contracts.
@@ -65,6 +65,8 @@ forge test -vvv
 
 | File                         | % Lines | % Functions | Status        |
 |------------------------------|---------|-------------|---------------|
+| `src/ChainlinkOracle.sol`    | 100%    | 100%        | ✅ Verified |
+| `src/PythOracle.sol`         | 100%    | 100%        | ✅ Verified |
 | `src/SecureChainlinkOracle.sol` | 100%    | 100%        | ✅ Verified |
 | `src/SecurePythOracle.sol`      | 100%    | 100%        | ✅ Verified |
 
