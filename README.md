@@ -1,78 +1,49 @@
-# 🧿 Oracle Integration Workshop
+# 🛡️ Fault-Tolerant Price Feeds
 
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?style=flat-square&logo=solidity)
-![DeFi](https://img.shields.io/badge/DeFi-Oracles-blueviolet?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Verified-brightgreen?style=flat-square)
+![Security](https://img.shields.io/badge/Security-Fault_Tolerant-blueviolet?style=flat-square)
+![Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen?style=flat-square)
 
-A professional project focused on implementing decentralized oracle integrations using Chainlink and Pyth Network.
+Resilient smart contract wrappers for integrating decentralized price feeds (Chainlink and Pyth). 
 
-This repository demonstrates how to build robust wrappers and fallback mechanisms, focusing on common risks like price manipulation and data staleness.
+This project evolved from a basic integration workshop into a hardened infrastructure. It focuses on mitigating common oracle attack vectors, ensuring data freshness, and providing seamless fallback mechanisms when external data providers experience outages.
 
----
+## 🏗 Architecture & Security Features
 
-## 🏗 Architecture & Safety
+### 1. Chainlink: Fallback Redundancy
+- **Context:** Relying on a single oracle feed creates a single point of failure. Network congestion or deprecation can halt the protocol.
+- **Implementation:** The `SecureChainlinkOracle` implements a Primary-Secondary fallback pattern. It uses a `try/catch` block to fetch from the primary aggregator. If the call fails, reverts, or returns stale data, it automatically routes the request to a secondary backup feed.
 
-### 1. Price Redundancy (Fallback)
-- **Context:** Dependency on a single oracle provider creates a point of failure.
-- **Implementation:** The `SecureChainlinkOracle` implements a primary-secondary provider logic. If the primary feed fails validation, the system switches to a secondary aggregator to maintain accurate valuations.
+### 2. Chainlink: Staleness Checks
+- **Implementation:** Strict validation of the `updatedAt` timestamp against a predefined `STALE_THRESHOLD`. Prevents the protocol from consuming outdated prices during network outages.
 
-### 2. Confidence & Precision (Pyth Optimization)
-- **Context:** Volatile market conditions can lead to wider price gaps.
-- **Implementation:** The `SecurePythOracle` utilizes Pyth's confidence interval data. We enforce a `MIN_CONFIDENCE_RATIO` to reject prices during periods of extreme uncertainty.
+### 3. Pyth: Confidence Interval Validation
+- **Context:** During high market volatility, price feeds can widen their spread. Using a median price without checking the confidence interval opens the door to arbitrage attacks.
+- **Implementation:** The `SecurePythOracle` validates the ratio between the price and its confidence interval. If the interval exceeds the `MIN_CONFIDENCE_RATIO` (e.g., extreme volatility or low liquidity), the transaction reverts, protecting the protocol's accounting.
 
-### 3. Staleness Guardrails
-- **Context:** Stale oracle data can lead to incorrect logic or arbitrage.
-- **Implementation:** Every retrieval is protected by a `STALE_THRESHOLD` check. For Chainlink, we validate `updatedAt`. For Pyth, we use `getPriceNoOlderThan(MAX_AGE_SECONDS)`, ensuring the data is fresh.
+### 4. Gas Optimization & State Management
+- Replaced all string-based `require` statements with Custom Errors.
+- Migrated address state variables to `immutable`, moving them from storage slots directly into the contract bytecode.
+- Enforced `external` visibility for data-fetching functions.
 
-### 4. Gas Management & State Security
-- **Implementation:** 
-    - **Immutables:** Storage variables are cached as `immutable` to minimize gas costs.
-    - **NatSpec:** 100% adherence to NatSpec to allow for better documentation.
-    - **Custom Errors:** Usage of specialized error types instead of strings to optimize execution cost.
+## 🧪 Testing & Quality Assurance
 
----
+The test suite is built with Foundry and achieves 100% coverage across all core contracts.
+It includes custom mock contracts (`MockV3Aggregator` and `MockPyth`) to simulate network failures, extreme volatility, and stale timestamps.
 
-## 📂 Repository Structure
-
-| Module | Contract | Core Purpose |
-| :--- | :--- | :--- |
-| **Chainlink** | `ChainlinkOracle.sol` | Wrapper for standard AggregatorV3. |
-| **Chainlink (Secure)** | `SecureChainlinkOracle.sol` | Fallback implementation. |
-| **Pyth** | `PythOracle.sol` | Update and fetcher for Pyth feeds. |
-| **Pyth (Secure)** | `SecurePythOracle.sol` | Best-practice validation for confidence and age. |
-
----
-
-## 🛠 Tech Stack
-
-* **Core:** Solidity `0.8.24`
-* **Foundry:** `forge`, `cast` (Industry standard for testing and scripts).
-* **Integrations:** Chainlink AggregatorV3, Pyth SDK Solidity.
-* **Libraries:** OpenZeppelin Contracts.
-
----
-
-## 📊 Testing & Performance
-
-The suite focuses on simulating oracle failures, extreme volatility, and staleness scenarios to ensure the defensive logic holds under stress.
-
-To execute the verification suite:
+To execute the test suite:
 ```bash
-forge test -vvv
+forge test
 ```
 
-**Security Coverage Metrics:**
+To view the coverage report:
+```bash
+forge coverage
+```
 
-| File                         | % Lines | % Functions | Status        |
-|------------------------------|---------|-------------|---------------|
-| `src/ChainlinkOracle.sol`    | 100%    | 100%        | ✅ Verified |
-| `src/PythOracle.sol`         | 100%    | 100%        | ✅ Verified |
-| `src/SecureChainlinkOracle.sol` | 100%    | 100%        | ✅ Verified |
-| `src/SecurePythOracle.sol`      | 100%    | 100%        | ✅ Verified |
+**Coverage Output:**
 
----
-
-## 📚 Resources
-- [Chainlink Security Docs](https://docs.chain.link/data-feeds/selecting-feeds)
-- [Pyth Best Practices](https://docs.pyth.network/consumers/best-practices)
-- [Foundry Book](https://book.getfoundry.sh/)
+| File                           | % Lines   | % Statements | % Branches | % Funcs   |
+|--------------------------------|-----------|--------------|------------|-----------|
+| src/SecureChainlinkOracle.sol  | 100.00%   | 100.00%      | 100.00%    | 100.00%   |
+| src/SecurePythOracle.sol       | 100.00%   | 100.00%      | 100.00%    | 100.00%   |
